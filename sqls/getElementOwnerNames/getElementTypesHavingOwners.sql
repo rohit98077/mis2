@@ -1,0 +1,23 @@
+SELECT DISTINCT (parent_entity)
+FROM reporting_web_ui_uat.entity_entity_reln
+WHERE parent_entity_attribute = 'Owner'
+    AND child_entity_attribute = 'OwnerId'
+
+/*
+MSR
+ASSOCIATE_SUBSTATION
+HVDC_LINE
+FSC
+TCSC
+AC_TRANSMISSION_LINE
+LINE_REACTOR
+TRANSFORMER
+BUS_REACTOR
+HVDC_POLE
+GENERATING_STATION
+BAY
+FILTER_BANK
+SVC
+STATCOM
+MSC
+*/
