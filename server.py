@@ -3,6 +3,7 @@ import datetime as dt
 from src.appConfig import getConfig
 from src.outagesRawDataCreator import createOutageEventsRawData
 from flask import Flask, request, jsonify
+from template import fetchGenUnitOutages
 
 app = Flask(__name__)
 appConfig = getConfig()
@@ -15,18 +16,31 @@ def hello():
 @app.route('/raw_outages', methods=['POST'])
 def create_raw_outages():
     # get start and end dates from post request body
-    reqData = request.get_json()
-    try:
-        startDate = dt.datetime.strptime(reqData['startDate'], '%Y-%m-%d')
-        endDate = dt.datetime.strptime(reqData['endDate'], '%Y-%m-%d')
-    except Exception as ex:
-        return jsonify({'message': 'Unable to parse start and end dates of this request body'}), 400
-    # create outages raw data between start and end dates
-    isRawDataCreationSuccess = createOutageEventsRawData(appConfig, startDate, endDate)
-    if isRawDataCreationSuccess:
-        return jsonify({'message': 'raw data creation successful!!!', 'startDate': startDate, 'endDate': endDate})
-    else:
-        return jsonify({'message': 'raw data creation was not success'}), 500
+    if request.method=='POST':
+	    reqData = request.get_json()
+	    try:
+	        startDate = dt.datetime.strptime(reqData['startDate'], '%Y-%m-%d')
+	        endDate = dt.datetime.strptime(reqData['endDate'], '%Y-%m-%d')
+	    except Exception as ex:
+	        return jsonify({'message': 'Unable to parse start and end dates of this request body'}), 400
+	    # create outages raw data between start and end dates
+	    isRawDataCreationSuccess = createOutageEventsRawData(appConfig, startDate, endDate)
+	    if isRawDataCreationSuccess:
+	        return jsonify({'message': 'raw data creation successful!!!', 'startDate': startDate, 'endDate': endDate})
+	    else:
+	        return jsonify({'message': 'raw data creation was not success'}), 500
+	else:
+		reqData = request.get_json()
+	    try:
+	        startDate = dt.datetime.strptime(reqData['startDate'], '%Y-%m-%d')
+	        endDate = dt.datetime.strptime(reqData['endDate'], '%Y-%m-%d')
+	    except Exception as ex:
+	        return jsonify({'message': 'Unable to parse start and end dates of this request body'}), 400
+	    try:
+	    	return jsonify({'message': fetchGenUnitOutages(appConfig['appDbConStr']) , 'startDate': startDate, 'endDate': endDate})
+	    except Exception as e:
+	    	return jsonify({'message':'Error occured while fetching data'}),500
+
 
 if __name__ == '__main__':
     app.run(host="127.0.0.1", port=int(appConfig['flaskPort']), debug=True)
